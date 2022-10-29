@@ -1,0 +1,30 @@
+#root .header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: white;
+  z-index: 30;
+}
+#root .header .wrapper {
+  margin: 0 auto;
+  width: 1000px;
+  height: 53px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#root .header .wrapper .logo {
+  width: 124px;
+  display: flex;
+  align-items: center;
+}
+#root .header .wrapper .navigation .nav-wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, 30px);
+  -moz-column-gap: 18px;
+       column-gap: 18px;
+}
+#root .header .wrapper .navigation .nav-wrapper .nav {
+  display: flex;
+  align-items: center;
+}/*# sourceMappingURL=index.css.map */

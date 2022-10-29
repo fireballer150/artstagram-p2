@@ -1,10 +1,9 @@
 * {
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
   color: black;
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: "Nanum Gothic", sans-serif;
 }
 
 html,
@@ -32,5 +31,4 @@ img {
 
 .txt-bold {
   font-weight: 700;
-}
-/*# sourceMappingURL=core.css.map */
+}/*# sourceMappingURL=core.css.map */
