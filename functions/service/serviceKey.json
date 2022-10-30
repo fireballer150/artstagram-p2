@@ -1,0 +1,12 @@
+{
+    "type": "service_account",
+    "project_id": "artstagram-p1",
+    "private_key_id": "257bede7b14e457771553c3c1502a0e8c016ac5b",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC/7s5Rvjhy409W\n4ZMWiwQ90fzO+1bE07YqePHAcqCavzBQn9aNipUVdNcUDFp5FiRH37aa06lB38UB\nFgmEgvbE/48z/4hq3CUlCR8RVqNK4aoZSHggf2WNRHgtnsPT6Clhdl00aEr0SSv4\nLDclWCNKMbVY1n8+985y4ctd1klBG1gJ7hFFfMw/0cvlj3UG3LeYs+E1wnXpsHyO\n4NuLVmRYaQQQydNMPVQCwz6aEIhMa+fF7Fit6QT0ZLojAS94yrJBzzco7EX0+x27\nA1h9RaTh29pzEMVQNxUg5TXI0ZC4uXa1i2K78QXspDYhAOerlbej0Fncf9ZDbTL7\nWyH8vDvTAgMBAAECggEABN0HB3w6hmB0TLYS/m0rNyGFGxAiDvDg+r0/q4nuUlIT\nL0RjTHa4k15lM++iMvf9ThLuxYhJWLzmVGbJes9Sc99PV0Z3H4fHhpo4Wj3DRMho\nXMoTGJqRzdQU98lALOs5333argo1o3BNN9oB026i821o4eV4YPW69fqxuSoO9P2y\nUEAypQX6ld1MSd/NhK85H2OJmVYbwzn/KCN0To4qJ01uSei/QM2nYjo0ByDcAEHq\nuZwC9hRkpaI5AKvJiDJDc+Rk8XlplpbD7pFfqAG85cJhE8PcF00zNAZlJ7hy7bR5\nHcI7A9v+0mWTWJ8rUzCDAXkz9ccjuK6HGnLTelytkQKBgQD0QFD4Y3qKjkqCqMv4\n6fVdmN6sqM+HjfhO91XBvj/2mqVp4xFiyzSznGj+F3EQ5Bax7P6FKKumg7D0ipLu\n2307u1EnFLjHvdDPQ0QYx8rTBGcMWAC1l9M2Cf1nRLwlEDar/eoZeYl0SvddDx7F\n2xKTa2Z2N4Yyv8rdet5IQj1r8QKBgQDJKj8WpYFPNNVSMirw2xuCKXxTFQbYnVFA\niyCp509KntqDeeEtke2hmKkTNsixzdjUiYBoZnPn1Y1X++qda2uT5r49VVJesKy4\nY3B2RuY6HqqINMtwigViJLhuP74zHSgvnxk+iulwvFDuzDDe3bIj7ONz0T84AZBr\nOD4vmRt4AwKBgQCKEzGyuMm1Oer1Iebst5V1a821XVi0EJWmTju0YpBWH+YSjcJu\nTuFkB69ytF2+ZrJNsuPO8sbWQuvt0chuLrYE5kdiCFzMzYkVIbmFKKyHzZ1TZQxB\nm6pSiiMuFbUmXpwJbmjALex+SUK84KdMwiMmIziw64J5feJ4gdTWlFuUgQKBgHmX\ndIy+uztiBvLo6fWtqqHxa3lYg0vZQyyNK9AmxVGoVRIVUFtYEleTy9aWTZbTgpVt\nC1WPX82o0gd1eKlwLZU3apPuB5y+k5fcWzTSxAQrVw5/QtyiQIDDC0twcgm5PPoT\n45FfK5z95rmAaKW9QRjf7deqidjTcTStyUDB/c17AoGBALiGcRdhqxuqr0qfjfxh\nDlJ6ROQtePHVtaC5N62NZAbb8I+OZFsiOshUdeBxWpYru2io6QVUMsfP/ezvy3V9\nAJkqPKkFu/ksK82voyYBPMKEJH5GiB/5E+m03ftoA7stKFPzg79RKyQxyu7Wi504\nv9xRo16aU9PsQE1J8GCdi796\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-2q1qe@artstagram-p1.iam.gserviceaccount.com",
+    "client_id": "114930466790653724860",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-2q1qe%40artstagram-p1.iam.gserviceaccount.com"
+}

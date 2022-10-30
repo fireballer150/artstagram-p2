@@ -12,7 +12,7 @@ import Profile from './Profile/Profile';
 function App() {
   return (
     <Router>
-      <Header></Header>
+      {/* <Header></Header> */}
       <Switch>
         <Route path="/" exact component={Login} />
         <Route path="/join" component={Join}></Route>
