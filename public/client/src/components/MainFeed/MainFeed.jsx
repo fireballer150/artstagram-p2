@@ -1,23 +1,108 @@
-import React from 'react'
+import firebaseApp from '@config/firebaseApp';
+import React, { useCallback,useRef,useState } from 'react'
+import { useSelector } from 'react-redux';
 import './css/index.css'
+
+const Fstorage = firebaseApp.storage()
+
+function uploadImageToFirebaseStorage(data,timestamp){
+    return new Promise((resolve,reject)=>{
+        Fstorage.ref(`feed/timestamp/feed.jpg`)
+        .putString(data.split(",")[1],'base64',{
+            contentType:'image/jpg'
+        }).then(snapshot=>{
+            snapshot.ref.getDownloadURL()
+                .then(url=>{
+                    console.log('이미지 업로드완료')
+                    resolve(url)
+                })
+                .catch((err)=>{reject(err)})
+        }).catch(err=>{
+            reject(err)
+        })
+    })
+}
 function MainFeed() {
+    const contextRef = useRef(null)
+    const session = useSelector(state=>state.auth.session)
+    const [context,setContext] = useState("");
+    const [feed_image,setFeed_image] = useState(undefined);
+    
+    const __makeFeed = useCallback(async(e)=>{
+        e.preventDefault()
+        if(session&&(context||feed_image)){
+            const nowTime = Date.now()
+            let downloadUrl = undefined;
+            if(feed_image){
+                downloadUrl = await uploadImageToFirebaseStorage(feed_image,nowTime)
+                                .catch(err=>{console.log(err)})
+            }
+            const {uid} = session
+            let url = '/feed/new';
+            await fetch(url,{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Allow-Control-Access-Origin':'*',
+                },
+                body:JSON.stringify({
+                    feed:{
+                        context,
+                        image: downloadUrl,
+                        like:0,
+                    },
+                    profile:{
+                        uid
+                    },
+                    timestamp: nowTime
+                })
+            })
+                .then((res)=>{
+                    // console.log("$$MainFeed$$",res.json())
+                    return res.clone().json()
+                })
+                .then((msg)=>{
+                    contextRef.current.value = '';
+                    setContext(undefined);
+                    setFeed_image(undefined)
+                    alert(JSON.stringify(msg))
+                    console.log(msg)
+                })
+                .catch(err=>console.log("fetchErr",err))
+        }
+    },[context,feed_image,session,contextRef])
+
+    const __getData64FromImage = useCallback((e)=>{
+        const filelist = e.target.files[0]
+        const reader = new FileReader()
+        reader.onload=(e)=>{
+            setFeed_image(e.target.result)
+        }
+        reader.readAsDataURL(filelist)
+    },[])
+
   return (
     <div className='mainfeed'>
       <div className='wrapper'>
         <div className='feed-list'>
-            <div className='write-feed'>
+            <form className='write-feed' onSubmit={__makeFeed}>
                 <div className='profile-image'>
                 </div>
                 <div className='inp'>
-                    <input type='text' placeholder='오늘 무슨 일이 있었나요?'/>
+                    <input type='text' placeholder='오늘 무슨 일이 있었나요?'
+                    onChange={(e)=>setContext(e.target.value)}
+                    ref={contextRef}
+                    />
                 </div>
                 <div className='get-image'>
                     <label htmlFor='get-image-input'>
                         <img src='/assets/main/add-image.svg' alt='이미지 추가하기' />
                     </label>
-                    <input className='get-image-input' type='file'></input>
+                    <input id='get-image-input' type='file'
+                    onChange={__getData64FromImage}/>
                 </div>
-            </div>
+            {/* <button type='submit' className='login-btn'>작성하기</button> */}
+            </form>
             <div className='feed'>
                 <div className='top'>
                     <div className='profile-image'></div>
