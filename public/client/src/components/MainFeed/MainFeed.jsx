@@ -59,14 +59,14 @@ function MainFeed() {
             })
                 .then((res)=>{
                     // console.log("$$MainFeed$$",res.json())
-                    return res.clone().json()
+                    return res.json()
                 })
                 .then((msg)=>{
                     contextRef.current.value = '';
                     setContext(undefined);
                     setFeed_image(undefined)
-                    alert(JSON.stringify(msg))
-                    console.log(msg)
+                    alert(JSON.stringify(msg.msg))
+                    // console.log(msg)
                 })
                 .catch(err=>console.log("fetchErr",err))
         }
