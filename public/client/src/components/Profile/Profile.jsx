@@ -1,22 +1,153 @@
+import firebaseApp from '@config/firebaseApp'
 import React from 'react'
+import { useEffect } from 'react'
+import { useState,useCallback } from 'react'
+import { useSelector } from 'react-redux'
 import './css/index.css'
 
+const Fdatabase = firebaseApp.database()
+const Fstorage = firebaseApp.storage()
 function Profile() {
-  return (
+    const [userImage,setUserImage] = useState(undefined)
+    const [quote,setQuote] = useState(undefined)
+    const session = useSelector(state=>state.auth.session)
+
+    const __uploadImageUrlToDatabase = useCallback(async(uid,url)=>{
+        await Fdatabase.ref(`users/${uid}/profile/image`).set(url)
+            .then(()=>{
+                alert('프로필 사진을 url로 업로드 했습니다.')
+            }).catch(err=>{console.log(err)})
+    },[])
+    const __uploadImageToStorage = useCallback(async(data)=>{
+        if(session){
+            const {uid} = session;
+            await Fstorage.ref(`users/${uid}/profile.jpg`)
+                .putString(data.split(",")[1],'base64',{
+                contentType:'image/jpg'
+                })
+                .then((snapshot)=>{
+                    snapshot.ref.getDownloadURL().then((url)=>{
+                        // console.log("snapshotgetdownloadurl",url)
+                        setUserImage(()=>url)
+                        __uploadImageUrlToDatabase(uid,url)
+                }).catch(err=>console.log(err))
+            }).catch(err=>console.log(err))
+        }
+    },[session])
+
+    const __getImage = useCallback((e)=>{
+        const filelist = e.target.files[0]
+        console.log("filelist",filelist)
+        const reader = new FileReader()
+        reader.onload = (e)=>{
+            // console.log("etargetImage",e.target.result)//base64 type source
+            // setUserImage(()=>e.target.result)
+            // console.log("Image",userImage)
+            __uploadImageToStorage(e.target.result)
+        }
+        reader.readAsDataURL(filelist)
+
+    },[__uploadImageToStorage])
+
+    const __onSubmit = useCallback((e)=>{
+        e.preventDefault()
+        if(session&&quote){
+            const {uid} = session
+            Fdatabase.ref(`users/${uid}/profile/quote`).set(quote)
+                .then(()=>{
+                    alert('한줄평이 변경되었습니다.')
+                })
+                .catch(err=>{console.log(err)})
+        }
+        console.log("submit!")
+    },[session,quote])
+
+    
+    useEffect(()=>{
+        if(session){
+            const {image} = session
+            // console.log("useEffectimage",image)
+            if(image){
+                // setUserImage(()=>image)
+                // console.log(image)
+            }else{setUserImage(undefined)}
+        }
+        return ()=>{}
+    },[session])
+    
+    // useEffect(()=>{
+    //     if(session){
+    //         const {image} = session
+    //         // console.log("useEffectimage",image)
+    //         if(image){
+    //             setUserImage(()=>image)
+    //             console.log(image)
+    //         }else{setUserImage(undefined)}
+    //     }
+    //     return ()=>{}
+    // },[session])
+
+
+    // const __uploadImageToStorage = useCallback(async(data)=>{
+    //     if(session){
+    //         const {uid} = session;
+    //         await Fstorage.ref(`users/${uid}/profile.jpg`).putString(data.split(",")[1],'base64',{
+    //             contentType:'image/jpg'
+    //         }).then((snapshot)=>{
+    //             snapshot.ref.getDownloadURL().then((url)=>{
+    //                 alert('프로필 사진을 url로 업로드 했습니다.')
+    //                 console.log("snapshotgetdownloadurl",url)
+    //             }).catch(err=>console.log(err))
+    //         }).catch(err=>console.log(err))
+    //     }
+    // },[session])
+
+    // const __getImage = useCallback((e)=>{
+    //     const filelist = e.target.files[0]
+    //     console.log("filelist",filelist)
+    //     const reader = new FileReader()
+    //     reader.onload = (e)=>{
+    //         // console.log("etargetImage",e.target.result)//base64 type source
+    //         setUserImage(()=>e.target.result)
+    //         // console.log("Image",userImage)
+    //         __uploadImageToStorage(e.target.result)
+    //     }
+    //     reader.readAsDataURL(filelist)
+        
+    // },[__uploadImageToStorage])
+
+    // const __onSubmit = useCallback((e)=>{
+    //     e.preventDefault()
+    //     if(session&&quote){
+    //         const {uid} = session
+    //         Fdatabase.ref(`users/${uid}/profile/quote`).set(quote)
+    //             .then(()=>{
+    //                 alert('한줄평이 변경되었습니다.')
+    //             })
+    //             .catch(err=>{console.log(err)})
+    //     }
+    //     console.log("submit!")
+    // },[session,quote])
+    return (
     <div className='profile'>
         <div className='wrapper'>
             <div className='info'>
-                <div className='profile-image'>
-
+                <div className='profile-image' style={userImage && {backgroundImage : `url(${userImage})`}}>
+                    {true && <input type='file' onChange={__getImage}/>}
                 </div>
                 <div className='profile-desc'>
                     <div className='nickname txt-bold'>
-                        codename
+                        {session ? session.displayName:"codename"}
                     </div>
-                    {false?
-                    <div className='quote'>
-                        <textarea placeholder='자신의 한줄평을 입력해주세요.'></textarea>
-                    </div>:
+                    {true?
+                    <form className='quote' onSubmit={__onSubmit}>
+                        <textarea defaultValue={session? session.quote:undefined} 
+                            placeholder='자신의 한줄평을 입력해주세요.'
+                            onBlur={(e)=>setQuote(e.target.value)}
+                        ></textarea>
+                        <button type='Submit' className='follow-btn txt-bold' >저장하기</button>
+                    </form>
+                    :
                     <>
                     <div className='quote'>
                         Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam quisquam nihil illo

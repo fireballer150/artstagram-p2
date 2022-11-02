@@ -12,7 +12,10 @@
     "rewrites": [
       {
         "source": "**",
-        "destination": "/index.html"
+        "destination": "/index.html",
+        "run": {
+          "region": "asia-northeast3"
+        }
       }
     ]
   },

@@ -3,15 +3,17 @@ const express = require("express");
 const cors = require("cors");
 const Fauth = firebaseApp.auth();
 const Fdatabase = firebaseApp.database();
+const fStorage = require("firebase/compat/storage");
 const router = express.Router();
 router.use(cors());
 router.options("*", cors);
 
 router.post("/user/new", (req, res, next) => {
+  console.log("/user/new$$req.body", req.body);
   const { email, password, nickname } = req.body;
   Fauth.createUser({
-    email: email,
-    password: password,
+    email,
+    password,
     displayName: nickname,
   })
     .then((credential) => {
@@ -42,7 +44,7 @@ router.post("/user/new", (req, res, next) => {
 router.post("/feed/new", (req, res, next) => {
   const { feed, profile, timestamp } = req.body;
   const { uid } = profile;
-  console.log("$$uid$$", uid);
+  // console.log("$$profile$$", profile);
   Fdatabase.ref("feed")
     .push({
       feed,
@@ -51,17 +53,18 @@ router.post("/feed/new", (req, res, next) => {
     })
     .then(async (snapshot) => {
       const fid = snapshot.key;
-      console.log("$$fid$$", fid);
+      // console.log("$$fid$$", fid);
       await Fdatabase.ref(`users/${uid}/feed`)
         .push(fid)
-        .then((res) => {
-          console.log($$$$$$$여기까찌$$$$$$$$);
-          res.json({
+        .then((result) => {
+          // console.log("$$$$$$$여기까찌$$$$$$$$", result);
+          return res.status(200).json({
             msg: "피드가 올라갔습니다.",
           });
         })
         .catch((err) => {
-          res.status(401).json({ err });
+          // console.log(err);
+          return res.status(401).json({ err });
         });
     })
     .catch((err) => {
@@ -69,26 +72,26 @@ router.post("/feed/new", (req, res, next) => {
     });
 });
 
-router.get("/helloworld", (req, res, next) => {
-  const email = {
-    email: "codename@code.com",
-    password: "12345678",
-  };
-  Fauth.createUser({
-    email: email.email,
-    password: email.password,
-  })
-    .then((credential) => {
-      const { uid } = credential;
-      console.log("$$$$$$$$$$$____$$$$$$$$$$$", uid);
-    })
-    .catch((err) => {
-      console.log("$$$$$$$$$$$____$$$$$$$$$$$", err);
-    });
+// router.get("/helloworld", (req, res, next) => {
+//   const email = {
+//     email: "codename@code.com",
+//     password: "12345678",
+//   };
+//   Fauth.createUser({
+//     email: email.email,
+//     password: email.password,
+//   })
+//     .then((credential) => {
+//       const { uid } = credential;
+//       console.log("$$$$$$$$$$$____$$$$$$$$$$$", uid);
+//     })
+//     .catch((err) => {
+//       console.log("$$$$$$$$$$$____$$$$$$$$$$$", err);
+//     });
 
-  res.json({
-    msg: "helloword",
-  });
-});
+//   res.json({
+//     msg: "helloword",
+//   });
+// });
 
 module.exports = router;

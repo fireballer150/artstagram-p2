@@ -51,6 +51,7 @@ function App() {
   useEffect(()=>{
     Fauth.onAuthStateChanged((users)=>{
       const {uid,displayname,email} = users
+      console.log("users$$$$$$$$$$",users)
       if(users){
         dispatch({
           type:__UPDATE_HEADER_STATE__,
@@ -77,9 +78,9 @@ function App() {
       {isHeaderOpen && <Header />}
       <Switch>
         <Route path="/" exact component={Login} />
-        <Route path="/join" component={Join}></Route>
-        <Route path="/feed" component={MainFeed}></Route>
-        <Route path="/profile" component={Profile}></Route>
+        <Route path="/join" exact component={Join}></Route>
+        <Route path="/feed" exact component={MainFeed}></Route>
+        <Route path="/profile" exact component={Profile}></Route>
       </Switch>
       {false && <Detail></Detail>}
     </Router>

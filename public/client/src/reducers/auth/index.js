@@ -1,5 +1,5 @@
 const initialState = {
-  sessin: undefined
+  session: undefined
 };
 const auth = (state = initialState, { type, payload }) => {
   switch (type) {

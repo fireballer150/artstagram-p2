@@ -2,6 +2,7 @@ import firebaseApp from '@config/firebaseApp';
 import React, { useCallback,useRef,useState } from 'react'
 import { useSelector } from 'react-redux';
 import './css/index.css'
+import 'firebase/compat/database';
 
 const Fstorage = firebaseApp.storage()
 
