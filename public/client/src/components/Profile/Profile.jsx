@@ -11,7 +11,7 @@ function Profile() {
     const [userImage,setUserImage] = useState(undefined)
     const [quote,setQuote] = useState(undefined)
     const session = useSelector(state=>state.auth.session)
-
+    console.log("$$$$$$$$$$session",session)
     const __uploadImageUrlToDatabase = useCallback(async(uid,url)=>{
         await Fdatabase.ref(`users/${uid}/profile/image`).set(url)
             .then(()=>{
@@ -40,9 +40,6 @@ function Profile() {
         console.log("filelist",filelist)
         const reader = new FileReader()
         reader.onload = (e)=>{
-            // console.log("etargetImage",e.target.result)//base64 type source
-            // setUserImage(()=>e.target.result)
-            // console.log("Image",userImage)
             __uploadImageToStorage(e.target.result)
         }
         reader.readAsDataURL(filelist)
@@ -62,72 +59,65 @@ function Profile() {
         console.log("submit!")
     },[session,quote])
 
-    
-    useEffect(()=>{
+    const __getUserProfileFromServer = useCallback(async()=>{
         if(session){
-            const {image} = session
-            // console.log("useEffectimage",image)
-            if(image){
-                // setUserImage(()=>image)
-                // console.log(image)
-            }else{setUserImage(undefined)}
+            const {uid} = session
+            console.log("이미지 받아오기전",userImage)
+            
+            let url = '/user/profile/image'
+
+            await fetch(url,{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Allow-Control-Access-Origin':'*',
+                },
+                body:JSON.stringify({
+                 uid
+                })
+            })
+            .then((res)=>
+                res.json()
+            )
+            .then(({image})=>{
+                console.log("이미지 받아온거",image)
+                setUserImage(()=>image)
+            })
+            .catch(err=>{console.log(err)})
         }
-        return ()=>{}
+    },[session])
+
+    const __getUserQuoteFromServer = useCallback(async()=>{
+        if(session){
+            const {uid} = session
+            console.log("$$$$$$$$uid",uid)
+            let url = '/user/profile/quote'
+
+            await fetch(url,{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Allow-Control-Access-Origin':'*',
+                },
+                body:JSON.stringify({
+                 uid
+                })
+            })
+            .then((res)=>res.json())
+            .then(({quote})=>{
+                console.log("Quote받아온거",quote)
+                setQuote(quote)
+            })
+            .catch(err=>{console.log(err)})
+        }
     },[session])
     
-    // useEffect(()=>{
-    //     if(session){
-    //         const {image} = session
-    //         // console.log("useEffectimage",image)
-    //         if(image){
-    //             setUserImage(()=>image)
-    //             console.log(image)
-    //         }else{setUserImage(undefined)}
-    //     }
-    //     return ()=>{}
-    // },[session])
-
-
-    // const __uploadImageToStorage = useCallback(async(data)=>{
-    //     if(session){
-    //         const {uid} = session;
-    //         await Fstorage.ref(`users/${uid}/profile.jpg`).putString(data.split(",")[1],'base64',{
-    //             contentType:'image/jpg'
-    //         }).then((snapshot)=>{
-    //             snapshot.ref.getDownloadURL().then((url)=>{
-    //                 alert('프로필 사진을 url로 업로드 했습니다.')
-    //                 console.log("snapshotgetdownloadurl",url)
-    //             }).catch(err=>console.log(err))
-    //         }).catch(err=>console.log(err))
-    //     }
-    // },[session])
-
-    // const __getImage = useCallback((e)=>{
-    //     const filelist = e.target.files[0]
-    //     console.log("filelist",filelist)
-    //     const reader = new FileReader()
-    //     reader.onload = (e)=>{
-    //         // console.log("etargetImage",e.target.result)//base64 type source
-    //         setUserImage(()=>e.target.result)
-    //         // console.log("Image",userImage)
-    //         __uploadImageToStorage(e.target.result)
-    //     }
-    //     reader.readAsDataURL(filelist)
-        
-    // },[__uploadImageToStorage])
-
-    // const __onSubmit = useCallback((e)=>{
-    //     e.preventDefault()
-    //     if(session&&quote){
-    //         const {uid} = session
-    //         Fdatabase.ref(`users/${uid}/profile/quote`).set(quote)
-    //             .then(()=>{
-    //                 alert('한줄평이 변경되었습니다.')
-    //             })
-    //             .catch(err=>{console.log(err)})
-    //     }
-    //     console.log("submit!")
-    // },[session,quote])
+    useEffect(()=>{
+      __getUserProfileFromServer()
+      __getUserQuoteFromServer()
+        return ()=>{}
+    },[__getUserProfileFromServer,__getUserQuoteFromServer])
+    
     return (
     <div className='profile'>
         <div className='wrapper'>
@@ -141,7 +131,7 @@ function Profile() {
                     </div>
                     {true?
                     <form className='quote' onSubmit={__onSubmit}>
-                        <textarea defaultValue={session? session.quote:undefined} 
+                        <textarea defaultValue={quote} 
                             placeholder='자신의 한줄평을 입력해주세요.'
                             onBlur={(e)=>setQuote(e.target.value)}
                         ></textarea>

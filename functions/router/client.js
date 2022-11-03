@@ -72,6 +72,42 @@ router.post("/feed/new", (req, res, next) => {
     });
 });
 
+router.post("/user/profile/image", (req, res, next) => {
+  const { uid } = req.body;
+  Fdatabase.ref(`/users/${uid}/profile/image`)
+    .once("value", (snapshot) => {
+      if (snapshot.exists()) {
+        res.status(200).json({
+          image: snapshot.val(),
+        });
+      } else {
+        res.status(400).json({
+          image: undefined,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
+});
+router.post("/user/profile/quote", (req, res, next) => {
+  const { uid } = req.body;
+  Fdatabase.ref(`/users/${uid}/profile/quote`)
+    .once("value", (snapshot) => {
+      if (snapshot.exists()) {
+        res.status(200).json({
+          quote: snapshot.val(),
+        });
+      } else {
+        res.status(400).json({
+          quote: undefined,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
+});
 // router.get("/helloworld", (req, res, next) => {
 //   const email = {
 //     email: "codename@code.com",

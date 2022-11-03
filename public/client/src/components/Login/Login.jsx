@@ -20,7 +20,7 @@ function Login() {
         Fauth.signInWithEmailAndPassword(email,password)
         .then((credential)=>{
             // const {user:{uid,displayName,email}} = credential;
-
+            // console.log("$$$$LoginComponent",displayName)
             // dispatch({
             //     type:__UPDATE_SESSION__,
             //     payload:{uid,displayName,email}

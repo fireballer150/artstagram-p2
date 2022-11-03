@@ -25,7 +25,7 @@ function App() {
     const nicknameRef = Fdatabase.ref('statics/nicknames')
     nicknameRef.on("value",snapshot=>{
       if(snapshot.exists()){
-        //데이터가 존재할때는 리덕스
+        //데이터가 존재할때는 리덕스상태로 업데이트
         dispatch({
           type:__NICKNAME_SERVICE_UPDATE__,
           payload: Object.values(snapshot.val())
