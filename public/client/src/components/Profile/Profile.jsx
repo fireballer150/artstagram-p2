@@ -3,6 +3,7 @@ import React from 'react'
 import { useEffect } from 'react'
 import { useState,useCallback } from 'react'
 import { useSelector } from 'react-redux'
+import Feed from '../Feed/Feed'
 import './css/index.css'
 
 const Fdatabase = firebaseApp.database()
@@ -10,6 +11,7 @@ const Fstorage = firebaseApp.storage()
 function Profile() {
     const [userImage,setUserImage] = useState(undefined)
     const [quote,setQuote] = useState(undefined)
+    const [feeds,setFeeds] = useState([])
     const session = useSelector(state=>state.auth.session)
     console.log("$$$$$$$$$$session",session)
     const __uploadImageUrlToDatabase = useCallback(async(uid,url)=>{
@@ -27,7 +29,6 @@ function Profile() {
                 })
                 .then((snapshot)=>{
                     snapshot.ref.getDownloadURL().then((url)=>{
-                        // console.log("snapshotgetdownloadurl",url)
                         setUserImage(()=>url)
                         __uploadImageUrlToDatabase(uid,url)
                 }).catch(err=>console.log(err))
@@ -62,8 +63,6 @@ function Profile() {
     const __getUserProfileFromServer = useCallback(async()=>{
         if(session){
             const {uid} = session
-            console.log("이미지 받아오기전",userImage)
-            
             let url = '/user/profile/image'
 
             await fetch(url,{
@@ -80,8 +79,7 @@ function Profile() {
                 res.json()
             )
             .then(({image})=>{
-                console.log("이미지 받아온거",image)
-                setUserImage(()=>image)
+                setUserImage(image)
             })
             .catch(err=>{console.log(err)})
         }
@@ -105,18 +103,42 @@ function Profile() {
             })
             .then((res)=>res.json())
             .then(({quote})=>{
-                console.log("Quote받아온거",quote)
                 setQuote(quote)
             })
             .catch(err=>{console.log(err)})
         }
     },[session])
     
+    const __getUserFeed = useCallback(()=>{
+        if(session){
+        const {uid} =session
+        let url = '/user/feed'
+
+            fetch(url,{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Allow-Control-Access-Origin':'*',
+                },
+                body:JSON.stringify({
+                uid
+                })
+            })
+            .then((res)=>res.json())
+            .then(({feed,msg})=>{
+                setFeeds(feed)
+            })
+            .catch(err=>{console.log(err)})
+    }
+        }
+    ,[session])
+
     useEffect(()=>{
       __getUserProfileFromServer()
       __getUserQuoteFromServer()
+      __getUserFeed()
         return ()=>{}
-    },[__getUserProfileFromServer,__getUserQuoteFromServer])
+    },[__getUserProfileFromServer,__getUserQuoteFromServer,__getUserFeed])
     
     return (
     <div className='profile'>
@@ -177,144 +199,9 @@ function Profile() {
                 <div className='feed-list'>
                     <div className='title txt-bold'>작성한 글</div>
                     <div className='feeds'>
-                        <div className='feed'>
-                            <div className='top'>
-                                <div className='profile-image'></div>
-                                <div className='profile-desc'>
-                                    <div className='nickname txt-bold'>
-                                        codename
-                                    </div>
-                                    <div className='timestamp'>
-                                        8:15 pm, yesterday
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='contents'>
-                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Commodi quos id delectus autem officiis laudantium temporibus? Quam, molestias voluptatibus? Maxime aperiam ipsam adipisci ullam illum nihil recusandae obcaecati quidem aspernatur?
-                            </div>
-                            <div className='bottom'>
-                                <div className='like'>
-                                    <div className='asset'>
-                                        <img src='./assets/feed/like-dac.svg' alt='좋아요'/>
-                                    </div>
-                                    <div className='count txt-bold'>
-                                        25k
-                                    </div>
-                                </div>
-                                <div className='comment'>
-                                    <div className='asset'>
-                                        <img src='./assets/feed/comment.svg' alt='댓글'/>
-                                    </div>
-                                    <div className='count txt-bold'>
-                                        2k
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='feed'>
-                            <div className='top'>
-                                <div className='profile-image'></div>
-                                <div className='profile-desc'>
-                                    <div className='nickname txt-bold'>
-                                        codename
-                                    </div>
-                                    <div className='timestamp'>
-                                        8:15 pm, yesterday
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='contents'>
-                                <div className='image'></div>
-                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Commodi quos id delectus autem officiis laudantium temporibus? Quam, molestias voluptatibus? Maxime aperiam ipsam adipisci ullam illum nihil recusandae obcaecati quidem aspernatur?
-                            </div>
-                            <div className='bottom'>
-                                <div className='like'>
-                                    <div className='asset'>
-                                        <img src='./assets/feed/like-dac.svg' alt='좋아요'/>
-                                    </div>
-                                    <div className='count txt-bold'>
-                                        25k
-                                    </div>
-                                </div>
-                                <div className='comment'>
-                                    <div className='asset'>
-                                        <img src='./assets/feed/comment.svg' alt='댓글'/>
-                                    </div>
-                                    <div className='count txt-bold'>
-                                        2k
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='feed'>
-                            <div className='top'>
-                                <div className='profile-image'></div>
-                                <div className='profile-desc'>
-                                    <div className='nickname txt-bold'>
-                                        codename
-                                    </div>
-                                    <div className='timestamp'>
-                                        8:15 pm, yesterday
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='contents'>
-                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Commodi quos id delectus autem officiis laudantium temporibus? Quam, molestias voluptatibus? Maxime aperiam ipsam adipisci ullam illum nihil recusandae obcaecati quidem aspernatur?
-                            </div>
-                            <div className='bottom'>
-                                <div className='like'>
-                                    <div className='asset'>
-                                        <img src='./assets/feed/like-dac.svg' alt='좋아요'/>
-                                    </div>
-                                    <div className='count txt-bold'>
-                                        25k
-                                    </div>
-                                </div>
-                                <div className='comment'>
-                                    <div className='asset'>
-                                        <img src='./assets/feed/comment.svg' alt='댓글'/>
-                                    </div>
-                                    <div className='count txt-bold'>
-                                        2k
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='feed'>
-                            <div className='top'>
-                                <div className='profile-image'></div>
-                                <div className='profile-desc'>
-                                    <div className='nickname txt-bold'>
-                                        codename
-                                    </div>
-                                    <div className='timestamp'>
-                                        8:15 pm, yesterday
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='contents'>
-                                <div className='image'></div>
-                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Commodi quos id delectus autem officiis laudantium temporibus? Quam, molestias voluptatibus? Maxime aperiam ipsam adipisci ullam illum nihil recusandae obcaecati quidem aspernatur?
-                            </div>
-                            <div className='bottom'>
-                                <div className='like'>
-                                    <div className='asset'>
-                                        <img src='./assets/feed/like-dac.svg' alt='좋아요'/>
-                                    </div>
-                                    <div className='count txt-bold'>
-                                        25k
-                                    </div>
-                                </div>
-                                <div className='comment'>
-                                    <div className='asset'>
-                                        <img src='./assets/feed/comment.svg' alt='댓글'/>
-                                    </div>
-                                    <div className='count txt-bold'>
-                                        2k
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        {feeds.map((item,idx)=>{
+                            return <Feed data={item} key={idx} />
+                        })}
                     </div>
                 </div>
                 <div className='profile-info-desc'>

@@ -44,6 +44,7 @@ router.post("/user/new", (req, res, next) => {
 router.post("/feed/new", (req, res, next) => {
   const { feed, profile, timestamp } = req.body;
   const { uid } = profile;
+  console.log(uid);
   // console.log("$$profile$$", profile);
   Fdatabase.ref("feed")
     .push({
@@ -51,20 +52,18 @@ router.post("/feed/new", (req, res, next) => {
       profile,
       timestamp: Date.now(),
     })
-    .then(async (snapshot) => {
+    .then((snapshot) => {
       const fid = snapshot.key;
       // console.log("$$fid$$", fid);
-      await Fdatabase.ref(`users/${uid}/feed`)
+      Fdatabase.ref(`users/${uid}/feed`)
         .push(fid)
-        .then((result) => {
-          // console.log("$$$$$$$여기까찌$$$$$$$$", result);
-          return res.status(200).json({
+        .then(() => {
+          res.status(200).json({
             msg: "피드가 올라갔습니다.",
           });
         })
         .catch((err) => {
-          // console.log(err);
-          return res.status(401).json({ err });
+          res.status(401).json({ err });
         });
     })
     .catch((err) => {
@@ -101,6 +100,31 @@ router.post("/user/profile/quote", (req, res, next) => {
       } else {
         res.status(400).json({
           quote: undefined,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
+});
+router.post("/user/feed", (req, res, next) => {
+  const { uid } = req.body;
+
+  Fdatabase.ref("feed")
+    .orderByChild("profile/uid")
+    .equalTo(uid)
+    .once("value", (snapshot) => {
+      if (snapshot.exists()) {
+        const value = snapshot.val();
+        const feedlength = Object.keys(value).length;
+        res.status(200).json({
+          feed: Object.values(value),
+          msg: `피드가 ${feedlength}개 존재 합니다.`,
+        });
+      } else {
+        res.status(200).json({
+          feed: [],
+          msg: "피드가 존재하지 않습니다.",
         });
       }
     })
