@@ -50,7 +50,7 @@ function App() {
 
   useEffect(()=>{
     Fauth.onAuthStateChanged((users)=>{
-      const {uid,displayname,email} = users
+      const {uid,displayName,email} = users
       console.log("users$$$$$$$$$$",users)
       if(users){
         dispatch({
@@ -60,7 +60,7 @@ function App() {
         dispatch({
           type: __UPDATE_SESSION__,
           payload: {
-            uid,displayname,email
+            uid,displayName,email
           }
         })
       }else{
