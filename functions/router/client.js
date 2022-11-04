@@ -44,8 +44,8 @@ router.post("/user/new", (req, res, next) => {
 router.post("/feed/new", (req, res, next) => {
   const { feed, profile, timestamp } = req.body;
   const { uid } = profile;
-  console.log(uid);
-  // console.log("$$profile$$", profile);
+  // console.log(uid);
+  // console.log("$$feed$$", feed);
   Fdatabase.ref("feed")
     .push({
       feed,

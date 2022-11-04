@@ -2,10 +2,29 @@ import React, { useCallback } from 'react'
 import { useEffect,useState } from 'react'
 import { useSelector } from 'react-redux'
 
+const oneDay = 1000*60*60*24;
+
+function makeTwoDigits(time){
+    return time.toString().length !==2 ?`0${time}`:time
+}
+
+function makeFeedTime(timestamp){
+    // console.log(timestamp)
+    const feedDate = new Date(timestamp)
+    const nowDate = Date.now();
+
+    const timeGap = nowDate - timestamp;
+    const date = parseInt(timeGap/oneDay);
+    const hour = feedDate.getHours()
+    const minutes = feedDate.getMinutes()
+
+    return `${hour>12?'오후':'오전'} ${hour>12? makeTwoDigits(hour-12):makeTwoDigits(hour)}:${makeTwoDigits(minutes)}, ${date ===0?'오늘':date ===1 ? '어제':`${date}일전`}`
+}
+
 function Feed(res) {
-    const {feed:{like,comment,context,image},
-            profile:{uid},
-            timestamp
+    let {feed:{like,comment,context,image},
+        profile:{uid},
+        timestamp
     }= res.data
     const session = useSelector(state=>state.auth.session)
     const [userImage,setUserImage] = useState(undefined)
@@ -49,7 +68,7 @@ function Feed(res) {
                     {session ? session.displayName:"codename"}
                 </div>
                 <div className='timestamp'>
-                    8:15 pm, yesterday
+                    {makeFeedTime(timestamp)}
                 </div>
             </div>
         </div>

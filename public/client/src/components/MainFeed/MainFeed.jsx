@@ -8,13 +8,13 @@ const Fstorage = firebaseApp.storage()
 
 function uploadImageToFirebaseStorage(data,timestamp){
     return new Promise((resolve,reject)=>{
-        Fstorage.ref(`feed/timestamp/feed.jpg`)
+        Fstorage.ref(`feed/${timestamp}/feed.jpg`)
         .putString(data.split(",")[1],'base64',{
             contentType:'image/jpg'
         }).then(snapshot=>{
             snapshot.ref.getDownloadURL()
                 .then(url=>{
-                    console.log('이미지 업로드완료')
+                    console.log('이미지 업로드완료',url)
                     resolve(url)
                 })
                 .catch((err)=>{reject(err)})
@@ -58,16 +58,14 @@ function MainFeed() {
                     timestamp: nowTime
                 })
             })
-                .then((res)=>{
-                    // console.log("$$MainFeed$$",res.json())
-                    return res.json()
-                })
+                .then((res)=>
+                    res.json()
+                )
                 .then((msg)=>{
                     contextRef.current.value = '';
                     setContext(undefined);
                     setFeed_image(undefined)
                     alert(JSON.stringify(msg.msg))
-                    // console.log(msg)
                 })
                 .catch(err=>console.log("fetchErr",err))
         }

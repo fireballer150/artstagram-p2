@@ -12,8 +12,9 @@ function Profile() {
     const [userImage,setUserImage] = useState(undefined)
     const [quote,setQuote] = useState(undefined)
     const [feeds,setFeeds] = useState([])
+    const [likeCount,setLikeCount] = useState(0);
     const session = useSelector(state=>state.auth.session)
-    console.log("$$$$$$$$$$session",session)
+    // console.log("$$$$$$$$$$session",session)
     const __uploadImageUrlToDatabase = useCallback(async(uid,url)=>{
         await Fdatabase.ref(`users/${uid}/profile/image`).set(url)
             .then(()=>{
@@ -29,12 +30,12 @@ function Profile() {
                 })
                 .then((snapshot)=>{
                     snapshot.ref.getDownloadURL().then((url)=>{
-                        setUserImage(()=>url)
+                        setUserImage(url)
                         __uploadImageUrlToDatabase(uid,url)
                 }).catch(err=>console.log(err))
             }).catch(err=>console.log(err))
         }
-    },[session])
+    },[session,__uploadImageUrlToDatabase])
 
     const __getImage = useCallback((e)=>{
         const filelist = e.target.files[0]
@@ -60,12 +61,12 @@ function Profile() {
         console.log("submit!")
     },[session,quote])
 
-    const __getUserProfileFromServer = useCallback(async()=>{
+    const __getUserProfileFromServer = useCallback(()=>{
         if(session){
             const {uid} = session
             let url = '/user/profile/image'
 
-            await fetch(url,{
+            fetch(url,{
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json',
@@ -85,13 +86,13 @@ function Profile() {
         }
     },[session])
 
-    const __getUserQuoteFromServer = useCallback(async()=>{
+    const __getUserQuoteFromServer = useCallback(()=>{
         if(session){
             const {uid} = session
             console.log("$$$$$$$$uid",uid)
             let url = '/user/profile/quote'
 
-            await fetch(url,{
+            fetch(url,{
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json',
@@ -126,7 +127,12 @@ function Profile() {
             })
             .then((res)=>res.json())
             .then(({feed,msg})=>{
-                setFeeds(feed)
+                const totalLikeCount = feed.reduce((prev,next)=>{
+                    return prev+next.feed.like
+                },0)
+                setLikeCount(totalLikeCount)
+                // console.log("받아온 피드",feed)
+                setFeeds(feed.reverse())
             })
             .catch(err=>{console.log(err)})
     }
@@ -170,30 +176,15 @@ function Profile() {
                 </div>
             </div>
             <div className='feed-images'>
-                <div className='feed-image'>
-                    <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLG3yqTeZwD5zGhULfn0bDqMjhaBPBLUXj-A&usqp=CAU' alt='' />
-                </div>
-                <div className='feed-image'>
-                    <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNvbuFlaLcHBvBbA7faxcix1kzm1nu88A81Q&usqp=CAU' alt='' />
-                </div>
-                <div className='feed-image'>
-                    <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSe_p6Z2V3cyoilJmvdDKf7IOMIEZhutZWZQ&usqp=CAU' alt='' />
-                </div>
-                <div className='feed-image'>
-                    <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAZiDugxvHYbgy20RP6yOnjQG240R7WtThOg&usqp=CAU' alt='' />
-                </div>
-                <div className='feed-image'>
-                    <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDWIrSSEyd03qjz0fpuQcAI8TVqmmhejgKxA&usqp=CAU' alt='' />
-                </div>
-                <div className='feed-image'>
-                    <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSa49FbiR-ce63WvbuCw0sPMJz2bg2dCj7fiA&usqp=CAU' alt='' />
-                </div>
-                <div className='feed-image'>
-                    <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRFUR6CMpA6Dqxx-SEaYdTUUSwEBWBJgSCqA&usqp=CAU' alt='' />
-                </div>
-                <div className='feed-image'>
-                    <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRR16d1a1SaIVQNMS7QQbBKsHF5RyHtQzGIhQ&usqp=CAU' alt='' />
-                </div>
+                    {feeds.filter(i=>i.feed.image).map((item,idx)=>{
+                        console.log(item)
+                        const {feed:{image}} = item;
+                        return (
+                            <div className='feed-image' key={idx}>
+                                <img src={image} alt='피드 이미지' />
+                            </div>
+                        )
+                    })}
             </div>
             <div className='profile-contents'>
                 <div className='feed-list'>
@@ -207,20 +198,71 @@ function Profile() {
                 <div className='profile-info-desc'>
                     <div className='desc'>
                         <div className='title txt-bold'>좋아요</div>
-                        <div className='count'>739,000</div>
+                        <div className='count'>{likeCount}</div>
                     </div>
                     <div className='desc'>
                         <div className='title txt-bold'>팔로워</div>
-                        <div className='count'>2,539,000</div>
+                        <div className='count'>0</div>
                     </div>
                     <div className='desc'>
                         <div className='title txt-bold'>포스트</div>
-                        <div className='count'>320</div>
+                        <div className='count'>{feeds.length}</div>
                     </div>
                     <div className='desc'>
                         <div className='title txt-bold'>친구</div>
-                        <div className='count'>236,320</div>
-                    </div> 
+                        <div className='count'>0</div>
+                    </div>
+
+                    <div className='my-friends'>
+                    <div className='title txt-bold'>
+                        추천친구
+                    </div>
+                    <ul className='friend-list-wrapper'>
+                        <li className='friend'>
+                            <div className='profile-image'></div>
+                            <div className='nickname txt-bold'>
+                                cutterballer
+                            </div>
+                        </li>
+                        <li className='friend'>
+                            <div className='profile-image'></div>
+                            <div className='nickname txt-bold'>
+                                cutterballer
+                            </div>
+                        </li>
+                        <li className='friend'>
+                            <div className='profile-image'></div>
+                            <div className='nickname txt-bold'>
+                                cutterballer
+                            </div>
+                        </li>
+                        <li className='friend'>
+                            <div className='profile-image'></div>
+                            <div className='nickname txt-bold'>
+                                cutterballer
+                            </div>
+                        </li>
+                        <li className='friend'>
+                            <div className='profile-image'></div>
+                            <div className='nickname txt-bold'>
+                                cutterballer
+                            </div>
+                        </li>
+                        <li className='friend'>
+                            <div className='profile-image'></div>
+                            <div className='nickname txt-bold'>
+                                cutterballer
+                            </div>
+                        </li>
+                        <li className='friend'>
+                            <div className='profile-image'></div>
+                            <div className='nickname txt-bold'>
+                                cutterballer
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
                 </div>
             </div>
         </div>
